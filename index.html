@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Healthcare Simplified</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    #app { padding: 2rem 1rem; max-width: 740px; margin: 0 auto; }
+    .header { margin-bottom: 1.5rem; }
+    .header h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+    .header p { font-size: 14px; color: #777; }
+    #search { width: 100%; font-size: 15px; padding: 11px 16px; border: 1px solid #ccc; border-radius: 12px; background: #fff; color: #1a1a1a; outline: none; }
+    #search:focus { border-color: #378ADD; box-shadow: 0 0 0 3px #378ADD22; }
+    .result-count { font-size: 12px; color: #aaa; margin-top: 8px; }
+    #results { margin-top: 1rem; display: flex; flex-direction: column; gap: 12px; }
+    .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 1rem 1.25rem; cursor: pointer; transition: border-color 0.15s; }
+    .card:hover { border-color: #bbb; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .card-name { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+    .risk-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+    .risk-low  { background: #EAF3DE; color: #3B6D11; }
+    .risk-med  { background: #FAEEDA; color: #854F0B; }
+    .risk-high { background: #FCEBEB; color: #A32D2D; }
+    .card-plain { font-size: 14px; color: #555; margin-top: 6px; line-height: 1.6; }
+    .expand-hint { font-size: 12px; color: #378ADD; margin-top: 8px; }
+    .card-detail { margin-top: 14px; border-top: 1px solid #eee; padding-top: 14px; display: none; flex-direction: column; gap: 10px; }
+    .card-detail.open { display: flex; }
+    .detail-row { display: flex; gap: 8px; }
+    .detail-label { font-size: 12px; color: #999; min-width: 110px; padding-top: 1px; flex-shrink: 0; }
+    .detail-val { font-size: 13px; color: #1a1a1a; line-height: 1.55; }
+    .risk-section { border-top: 1px solid #eee; padding-top: 14px; margin-top: 4px; }
+    .risk-section-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+    .risk-section-sub { font-size: 12px; color: #999; margin-bottom: 14px; }
+    .icon-block { margin-bottom: 16px; }
+    .icon-block-label { font-size: 13px; color: #444; margin-bottom: 8px; line-height: 1.5; }
+    .icon-grid { display: grid; grid-template-columns: repeat(10, 13px); gap: 3px; margin-top: 8px; }
+    .icon-person { width: 13px; height: 17px; border-radius: 4px 4px 2px 2px; background: #e0e0e0; }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #666; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .risk-bars { display: flex; flex-direction: column; gap: 14px; }
+    .risk-item-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+    .risk-item-label { font-size: 13px; color: #1a1a1a; font-weight: 500; }
+    .risk-item-pct { font-size: 13px; font-weight: 700; }
+    .bar-track { height: 9px; background: #ececec; border-radius: 5px; overflow: hidden; margin-bottom: 4px; }
+    .bar-fill { height: 100%; border-radius: 5px; }
+    .risk-words { font-size: 11px; color: #888; }
+    .no-results { font-size: 14px; color: #888; text-align: center; padding: 2rem 0; }
+    .disclaimer { font-size: 11px; color: #bbb; margin-top: 16px; line-height: 1.5; border-top: 1px solid #eee; padding-top: 12px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <h1>Healthcare Simplified</h1>
+    <p>Healthcare made easy so you don't have to worry.</p>
+  </div>
+  <input id="search" type="text" placeholder="Search a procedure, e.g. knee, heart, appendix..." autocomplete="off" />
+  <div class="result-count" id="count"></div>
+  <div id="results"></div>
+</div>
+
+<script>
+var procedures = [
+  {
+    name: "Appendectomy",
+    tags: ["appendix","appendectomy","stomach","abdominal"],
+    risk: "low",
+    plain: "Removal of the appendix — a small pouch attached to the large intestine. Usually done as an emergency when the appendix becomes infected and swollen.",
+    what: "A surgeon makes small cuts in your abdomen and removes the appendix using a tiny camera (laparoscopic surgery). Smaller cuts means faster healing and less pain than older open surgery methods.",
+    recovery: "1–3 weeks. Most patients go home the next day.",
+    why: "A swollen appendix can burst and cause a life-threatening infection if not removed quickly.",
+    overallCount: 3,
+    riskFactors: [
+      { label: "Wound infection", pct: 3 },
+      { label: "Internal bleeding", pct: 1 },
+      { label: "Anesthesia reaction", pct: 0.5 },
+      { label: "Injury to nearby organs", pct: 0.3 }
+    ]
+  },
+  {
+    name: "Knee replacement",
+    tags: ["knee","replacement","joint","arthroplasty"],
+    risk: "med",
+    plain: "The damaged surfaces of your knee joint are replaced with metal and plastic parts so your knee can move without pain.",
+    what: "A surgeon removes worn-out cartilage and bone from the knee and caps it with artificial components shaped to move like a real joint. Both sides of the joint are replaced.",
+    recovery: "6–12 weeks to walk comfortably. Full recovery can take up to a year with physical therapy.",
+    why: "Recommended when knee pain from arthritis is severe enough to limit daily activities and other treatments haven't helped.",
+    overallCount: 10,
+    riskFactors: [
+      { label: "Blood clots in leg (DVT)", pct: 2 },
+      { label: "Infection", pct: 1 },
+      { label: "Stiffness needing further treatment", pct: 4 },
+      { label: "Implant loosening within 10 years", pct: 5 }
+    ]
+  },
+  {
+    name: "Gallbladder removal (cholecystectomy)",
+    tags: ["gallbladder","cholecystectomy","gallstones"],
+    risk: "low",
+    plain: "Removal of the gallbladder — a small organ under your liver that stores bile. Done when gallstones cause repeated pain or blockages.",
+    what: "Using small cuts and a camera, the surgeon detaches and removes the gallbladder. Your body digests normally without it — bile flows directly from the liver to your intestine.",
+    recovery: "1–2 weeks for keyhole surgery. Up to 6 weeks if open surgery is needed.",
+    why: "Gallstones can block bile ducts, cause severe pain, and lead to serious infection if left untreated.",
+    overallCount: 3,
+    riskFactors: [
+      { label: "Digestive changes (loose stools)", pct: 3 },
+      { label: "Wound infection", pct: 2 },
+      { label: "Bleeding", pct: 1 },
+      { label: "Bile duct injury", pct: 0.5 }
+    ]
+  },
+  {
+    name: "Coronary artery bypass (CABG)",
+    tags: ["heart","bypass","cabg","coronary","cardiac"],
+    risk: "high",
+    plain: "A blood vessel from another part of your body is used to create a detour around a blocked heart artery, restoring blood flow to the heart muscle.",
+    what: "The chest is opened, and a vein or artery from your leg or chest wall is attached above and below the blockage to reroute blood. The heart may be temporarily stopped while a machine pumps blood for you.",
+    recovery: "4–6 weeks before light activity. Full recovery 3–6 months.",
+    why: "Performed when heart arteries are severely blocked and stents or medication alone are not enough to restore safe blood flow.",
+    overallCount: 25,
+    riskFactors: [
+      { label: "Irregular heartbeat (atrial fibrillation)", pct: 20 },
+      { label: "Temporary memory or thinking changes", pct: 15 },
+      { label: "Kidney problems", pct: 5 },
+      { label: "Wound infection", pct: 3 },
+      { label: "Stroke", pct: 2 }
+    ]
+  },
+  {
+    name: "Hip replacement",
+    tags: ["hip","replacement","joint","arthroplasty"],
+    risk: "med",
+    plain: "The damaged ball-and-socket hip joint is replaced with artificial parts so you can move without pain.",
+    what: "The surgeon removes the worn femoral head (ball) and damaged socket, replacing both with metal, ceramic, or plastic implants that mimic the natural movement of your hip.",
+    recovery: "6 weeks to walk with assistance. Full recovery 3–6 months.",
+    why: "Recommended when hip arthritis or injury severely limits movement and pain medication no longer provides relief.",
+    overallCount: 10,
+    riskFactors: [
+      { label: "Leg length difference", pct: 5 },
+      { label: "Joint dislocation", pct: 3 },
+      { label: "Blood clots", pct: 2 },
+      { label: "Infection", pct: 1 }
+    ]
+  },
+  {
+    name: "Cataract surgery",
+    tags: ["eye","cataract","vision","lens"],
+    risk: "low",
+    plain: "The cloudy lens inside your eye is removed and replaced with a clear artificial lens to restore your vision.",
+    what: "Using an ultrasound probe, the cloudy lens is broken up and removed through a tiny incision. A new clear lens is folded and inserted — no stitches are usually needed. The whole procedure takes about 15 minutes.",
+    recovery: "Most people see better within a few days. Full healing takes about 8 weeks.",
+    why: "Cataracts cloud the natural lens over time, making vision blurry, dim, or yellowish. Surgery is the only effective treatment.",
+    overallCount: 2,
+    riskFactors: [
+      { label: "Posterior lens clouding (treatable with laser)", pct: 10 },
+      { label: "Swelling of the central vision area", pct: 1 },
+      { label: "Retinal detachment", pct: 0.5 },
+      { label: "Serious eye infection", pct: 0.1 }
+    ]
+  },
+  {
+    name: "Hysterectomy",
+    tags: ["uterus","hysterectomy","gynecology","womb"],
+    risk: "med",
+    plain: "Surgical removal of the uterus. Sometimes the ovaries and fallopian tubes are also removed depending on the reason for surgery.",
+    what: "Can be done through the abdomen, vagina, or using keyhole surgery. After surgery, you will no longer have menstrual periods or be able to become pregnant.",
+    recovery: "4–6 weeks for most daily activities. Up to 8 weeks for full recovery.",
+    why: "Performed for fibroids, endometriosis, uterine prolapse, cancer, or chronic pelvic pain that hasn't responded to other treatments.",
+    overallCount: 10,
+    riskFactors: [
+      { label: "Infection", pct: 3 },
+      { label: "Heavy bleeding requiring transfusion", pct: 2 },
+      { label: "Blood clots", pct: 1 },
+      { label: "Bladder or ureter injury", pct: 1 }
+    ]
+  },
+  {
+    name: "Hernia repair",
+    tags: ["hernia","groin","abdominal","inguinal"],
+    risk: "low",
+    plain: "Tissue that has pushed through a weak spot in the abdominal wall is guided back into place and the weakness is reinforced — usually with a small surgical mesh patch.",
+    what: "Through small incisions, the surgeon guides the protruding tissue back into position and covers the weakened area with mesh that becomes permanent support, reducing the chance of the hernia returning.",
+    recovery: "1–3 weeks for light activity. Heavy lifting restricted for up to 6 weeks.",
+    why: "Hernias can become dangerous if the trapped tissue loses its blood supply — a medical emergency called strangulation.",
+    overallCount: 5,
+    riskFactors: [
+      { label: "Chronic pain at surgery site", pct: 8 },
+      { label: "Hernia coming back", pct: 5 },
+      { label: "Wound infection", pct: 2 },
+      { label: "Nerve damage", pct: 1 }
+    ]
+  },
+  {
+    name: "Spinal fusion",
+    tags: ["spine","back","spinal","fusion","vertebrae"],
+    risk: "high",
+    plain: "Two or more vertebrae (the bones in your spine) are permanently joined together to stop painful movement between them.",
+    what: "Bone graft material is placed between the targeted vertebrae. Metal rods, screws, or plates hold them in position while they slowly grow together into one solid piece of bone over several months.",
+    recovery: "3–6 months before returning to most normal activity. The bone fusion itself takes up to 1 year to fully complete.",
+    why: "Recommended for severe spinal instability, degenerative disc disease, scoliosis, or fractures compressing nearby nerves.",
+    overallCount: 20,
+    riskFactors: [
+      { label: "Adjacent spinal segment deterioration", pct: 15 },
+      { label: "Incomplete or failed bone fusion", pct: 5 },
+      { label: "Infection", pct: 4 },
+      { label: "Nerve damage", pct: 3 },
+      { label: "Metal hardware failure", pct: 3 }
+    ]
+  },
+  {
+    name: "Tonsillectomy",
+    tags: ["tonsils","tonsillectomy","throat","pediatric"],
+    risk: "low",
+    plain: "Surgical removal of the tonsils — two gland-like pads at the back of the throat — usually because of repeated infections or breathing difficulties.",
+    what: "The surgeon removes both tonsils through the mouth using a scalpel or energy-based cutting tool. Performed under general anesthesia, usually takes under an hour. Common in both children and adults.",
+    recovery: "7–14 days. The throat will be sore — soft foods, cold fluids, and rest are important throughout.",
+    why: "Recommended when tonsil infections recur frequently (typically 7 or more per year) or when enlarged tonsils block breathing during sleep.",
+    overallCount: 3,
+    riskFactors: [
+      { label: "Post-operative bleeding", pct: 3 },
+      { label: "Dehydration from not drinking", pct: 2 },
+      { label: "Infection", pct: 2 },
+      { label: "Anesthesia reaction", pct: 0.5 }
+    ]
+  }
+];
+
+function getRiskColor(pct) {
+  if (pct < 2) return '#639922';
+  if (pct <= 10) return '#BA7517';
+  return '#E24B4A';
+}
+
+function inWords(pct) {
+  if (pct < 0.5) return 'Very rare — fewer than 1 in 200 patients';
+  if (pct < 1)   return 'Uncommon — fewer than 1 in 100 patients';
+  if (pct < 2)   return 'About 1 in every 100 patients';
+  return 'About ' + Math.round(pct) + ' in every 100 patients';
+}
+
+function barWidth(pct) {
+  return Math.min((pct / 20) * 100, 100).toFixed(1);
+}
+
+function overallColor(risk) {
+  return risk === 'low' ? '#639922' : risk === 'med' ? '#BA7517' : '#E24B4A';
+}
+
+function buildIconGrid(count, color) {
+  var html = '<div class="icon-grid">';
+  for (var i = 0; i < 100; i++) {
+    if (i < count) {
+      html += '<div class="icon-person" style="background:' + color + '"></div>';
+    } else {
+      html += '<div class="icon-person"></div>';
+    }
+  }
+  return html + '</div>';
+}
+
+function buildCard(p, i) {
+  var riskLabel = p.risk === 'low' ? 'Lower risk' : p.risk === 'med' ? 'Moderate risk' : 'Higher risk';
+  var oc = p.overallCount;
+  var oColor = overallColor(p.risk);
+
+  var bars = p.riskFactors.map(function(f) {
+    var c = getRiskColor(f.pct);
+    return '<div>' +
+      '<div class="risk-item-top">' +
+        '<span class="risk-item-label">' + f.label + '</span>' +
+        '<span class="risk-item-pct" style="color:' + c + '">' + f.pct + '%</span>' +
+      '</div>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + barWidth(f.pct) + '%;background:' + c + '"></div></div>' +
+      '<div class="risk-words">' + inWords(f.pct) + '</div>' +
+    '</div>';
+  }).join('');
+
+  return '<div class="card" onclick="toggle(' + i + ')">' +
+    '<div class="card-top">' +
+      '<div class="card-name">' + p.name + '</div>' +
+      '<span class="risk-badge risk-' + p.risk + '">' + riskLabel + '</span>' +
+    '</div>' +
+    '<div class="card-plain">' + p.plain + '</div>' +
+    '<div class="expand-hint">Tap to see full breakdown and risk data &#8595;</div>' +
+    '<div class="card-detail" id="detail-' + i + '">' +
+      '<div class="detail-row"><span class="detail-label">What happens</span><span class="detail-val">' + p.what + '</span></div>' +
+      '<div class="detail-row"><span class="detail-label">Recovery</span><span class="detail-val">' + p.recovery + '</span></div>' +
+      '<div class="detail-row"><span class="detail-label">Why it\'s done</span><span class="detail-val">' + p.why + '</span></div>' +
+      '<div class="risk-section">' +
+        '<div class="risk-section-title">Risk breakdown</div>' +
+        '<div class="risk-section-sub">Real numbers on how often complications occur — and what they actually mean.</div>' +
+        '<div class="icon-block">' +
+          '<div class="icon-block-label">Out of every <strong>100 patients</strong> who have this procedure, about <strong style="color:' + oColor + '">' + oc + '</strong> may experience a complication. Each block below represents one patient:</div>' +
+          buildIconGrid(oc, oColor) +
+        '</div>' +
+        '<div class="legend">' +
+          '<div class="legend-item"><div class="legend-dot" style="background:#639922"></div>Under 2% &mdash; low chance</div>' +
+          '<div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>2&ndash;10% &mdash; moderate</div>' +
+          '<div class="legend-item"><div class="legend-dot" style="background:#E24B4A"></div>Over 10% &mdash; higher chance</div>' +
+        '</div>' +
+        '<div class="risk-bars">' + bars + '</div>' +
+        '<div class="disclaimer">These figures are approximate averages drawn from published medical literature. Individual risk varies based on age, health history, and surgical setting. Always discuss your personal risk with your doctor.</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function toggle(i) {
+  document.getElementById('detail-' + i).classList.toggle('open');
+}
+
+var search = document.getElementById('search');
+var results = document.getElementById('results');
+var countEl = document.getElementById('count');
+
+function render(list) {
+  countEl.textContent = list.length > 0 ? list.length + ' result' + (list.length !== 1 ? 's' : '') : '';
+  if (list.length === 0) {
+    results.innerHTML = '<div class="no-results">No procedures found. Try a different search term.</div>';
+    return;
+  }
+  results.innerHTML = list.map(function(p, i) { return buildCard(p, i); }).join('');
+}
+
+search.addEventListener('input', function() {
+  var q = search.value.toLowerCase().trim();
+  if (!q) { render(procedures); return; }
+  var filtered = procedures.filter(function(p) {
+    return p.name.toLowerCase().includes(q) ||
+      p.tags.some(function(t) { return t.includes(q); }) ||
+      p.plain.toLowerCase().includes(q);
+  });
+  render(filtered);
+});
+
+render(procedures);
+</script>
+</body>
+</html>
