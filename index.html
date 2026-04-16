@@ -6,58 +6,102 @@
   <title>Simply Healthcare</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    body { font-family: system-ui, sans-serif; background: #f0f4f8; color: #1a2a3a; }
     #app { padding: 2rem 1rem; max-width: 740px; margin: 0 auto; }
-    .header { margin-bottom: 1.5rem; }
-    .header h1 { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
-    .header p { font-size: 14px; color: #777; }
-    #search { width: 100%; font-size: 15px; padding: 11px 16px; border: 1px solid #ccc; border-radius: 12px; background: #fff; color: #1a1a1a; outline: none; }
-    #search:focus { border-color: #378ADD; box-shadow: 0 0 0 3px #378ADD22; }
-    .result-count { font-size: 12px; color: #aaa; margin-top: 8px; }
-    #results { margin-top: 1rem; display: flex; flex-direction: column; gap: 12px; }
-    .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 1rem 1.25rem; cursor: pointer; transition: border-color 0.15s; }
-    .card:hover { border-color: #bbb; }
-    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .card-name { font-size: 16px; font-weight: 600; color: #1a1a1a; }
-    .risk-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
-    .risk-low  { background: #EAF3DE; color: #3B6D11; }
-    .risk-med  { background: #FAEEDA; color: #854F0B; }
-    .risk-high { background: #FCEBEB; color: #A32D2D; }
-    .card-plain { font-size: 14px; color: #555; margin-top: 6px; line-height: 1.6; }
-    .expand-hint { font-size: 12px; color: #378ADD; margin-top: 8px; }
-    .card-detail { margin-top: 14px; border-top: 1px solid #eee; padding-top: 14px; display: none; flex-direction: column; gap: 10px; }
+
+    .header { margin-bottom: 1.75rem; text-align: center; }
+    .header h1 { font-size: 28px; font-weight: 700; color: #1a5276; margin-bottom: 6px; letter-spacing: -0.5px; }
+    .header p { font-size: 15px; color: #5d7a8a; }
+
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #9ab; pointer-events: none; }
+    #search {
+      width: 100%; font-size: 15px; padding: 12px 16px 12px 40px;
+      border: 1.5px solid #cddbe8; border-radius: 14px;
+      background: #fff; color: #1a2a3a; outline: none;
+      box-shadow: 0 2px 8px rgba(26,82,118,0.06);
+    }
+    #search:focus { border-color: #2e86c1; box-shadow: 0 0 0 3px rgba(46,134,193,0.15); }
+
+    .result-count { font-size: 12px; color: #aab; margin-top: 8px; padding-left: 2px; }
+    #results { margin-top: 1rem; display: flex; flex-direction: column; gap: 14px; }
+
+    .card {
+      background: #fff; border: 1.5px solid #dce8f0;
+      border-radius: 16px; padding: 1.1rem 1.4rem;
+      cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(26,82,118,0.05);
+    }
+    .card:hover { border-color: #2e86c1; box-shadow: 0 4px 16px rgba(46,134,193,0.1); }
+
+    .card-name { font-size: 16px; font-weight: 700; color: #1a5276; }
+    .card-plain { font-size: 14px; color: #4a6070; margin-top: 6px; line-height: 1.65; }
+    .expand-hint { font-size: 12px; color: #2e86c1; margin-top: 9px; font-weight: 500; }
+
+    .card-detail { margin-top: 16px; border-top: 1.5px solid #eaf1f8; padding-top: 16px; display: none; flex-direction: column; gap: 12px; }
     .card-detail.open { display: flex; }
-    .detail-row { display: flex; gap: 8px; }
-    .detail-label { font-size: 12px; color: #999; min-width: 110px; padding-top: 1px; flex-shrink: 0; }
-    .detail-val { font-size: 13px; color: #1a1a1a; line-height: 1.55; }
-    .risk-section { border-top: 1px solid #eee; padding-top: 14px; margin-top: 4px; }
-    .risk-section-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
-    .risk-section-sub { font-size: 12px; color: #999; margin-bottom: 14px; }
-    .icon-block { margin-bottom: 16px; }
-    .icon-block-label { font-size: 13px; color: #444; margin-bottom: 8px; line-height: 1.5; }
-    .icon-grid { display: grid; grid-template-columns: repeat(10, 13px); gap: 3px; margin-top: 8px; }
-    .icon-person { width: 13px; height: 17px; border-radius: 4px 4px 2px 2px; background: #e0e0e0; }
-    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
-    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #666; }
-    .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-    .risk-bars { display: flex; flex-direction: column; gap: 14px; }
-    .risk-item-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-    .risk-item-label { font-size: 13px; color: #1a1a1a; font-weight: 500; }
-    .risk-item-pct { font-size: 13px; font-weight: 700; }
-    .bar-track { height: 9px; background: #ececec; border-radius: 5px; overflow: hidden; margin-bottom: 4px; }
-    .bar-fill { height: 100%; border-radius: 5px; }
-    .risk-words { font-size: 11px; color: #888; }
-    .no-results { font-size: 14px; color: #888; text-align: center; padding: 2rem 0; }
-    .disclaimer { font-size: 11px; color: #bbb; margin-top: 16px; line-height: 1.5; border-top: 1px solid #eee; padding-top: 12px; }
+
+    .detail-row { display: flex; gap: 10px; }
+    .detail-label { font-size: 12px; color: #8aabb8; min-width: 110px; padding-top: 2px; flex-shrink: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+    .detail-val { font-size: 13px; color: #2a3a4a; line-height: 1.6; }
+
+    /* Reassurance band */
+    .reassure-band { background: #eaf4fb; border-radius: 10px; padding: 12px 14px; margin-bottom: 4px; }
+    .reassure-band p { font-size: 13px; color: #1a5276; line-height: 1.6; }
+    .reassure-band strong { font-weight: 700; }
+
+    /* Risk section */
+    .risk-section { border-top: 1.5px solid #eaf1f8; padding-top: 16px; margin-top: 4px; }
+    .risk-section-title { font-size: 15px; font-weight: 700; color: #1a5276; margin-bottom: 3px; }
+    .risk-section-sub { font-size: 12px; color: #8aabb8; margin-bottom: 16px; }
+
+    /* Icon grid — positive framing (shows safe majority) */
+    .icon-block { margin-bottom: 18px; }
+    .icon-block-label { font-size: 13px; color: #2a3a4a; margin-bottom: 10px; line-height: 1.6; }
+    .icon-grid { display: grid; grid-template-columns: repeat(10, 16px); gap: 4px; }
+    .icon-person {
+      width: 16px; height: 20px; border-radius: 5px 5px 3px 3px;
+      background: #d4eaf7;
+    }
+    .icon-person.safe { background: #2e86c1; }
+    .icon-person.affected { background: #e8ae6a; }
+
+    .icon-legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+    .icon-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #5d7a8a; }
+    .icon-legend-box { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+    /* Outcome bars */
+    .outcome-bars { display: flex; flex-direction: column; gap: 16px; margin-top: 4px; }
+    .outcome-title { font-size: 13px; font-weight: 700; color: #1a5276; margin-bottom: 16px; }
+
+    .outcome-item {}
+    .outcome-item-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+    .outcome-item-label { font-size: 13px; color: #2a3a4a; font-weight: 500; }
+    .outcome-pct-wrap { display: flex; gap: 8px; align-items: baseline; }
+    .outcome-pct-safe { font-size: 14px; font-weight: 700; color: #1a7a4a; }
+    .outcome-pct-risk { font-size: 11px; color: #9aabb8; }
+
+    .dual-bar-track { height: 10px; background: #ececec; border-radius: 6px; overflow: hidden; display: flex; margin-bottom: 5px; }
+    .dual-bar-safe { height: 100%; background: linear-gradient(90deg, #27ae60, #52c788); border-radius: 6px 0 0 6px; }
+    .dual-bar-risk { height: 100%; background: #e8ae6a; }
+
+    .outcome-words { font-size: 11px; color: #8aabb8; }
+
+    .no-results { font-size: 14px; color: #8aabb8; text-align: center; padding: 2rem 0; }
+    .disclaimer { font-size: 11px; color: #b0c4d0; margin-top: 16px; line-height: 1.6; border-top: 1px solid #eaf1f8; padding-top: 12px; }
   </style>
 </head>
 <body>
 <div id="app">
   <div class="header">
-    <h1>Healthcare Simplified</h1>
+    <h1>Simply Healthcare</h1>
     <p>Healthcare made easy so you don't have to worry.</p>
   </div>
-  <input id="search" type="text" placeholder="Search a procedure, e.g. knee, heart, appendix..." autocomplete="off" />
+
+  <div class="search-wrap">
+    <span class="search-icon">&#128269;</span>
+    <input id="search" type="text" placeholder="Search a procedure, e.g. knee, heart, appendix..." autocomplete="off" />
+  </div>
   <div class="result-count" id="count"></div>
   <div id="results"></div>
 </div>
@@ -67,45 +111,47 @@ var procedures = [
   {
     name: "Appendectomy",
     tags: ["appendix","appendectomy","stomach","abdominal"],
-    risk: "low",
     plain: "Removal of the appendix — a small pouch attached to the large intestine. Usually done as an emergency when the appendix becomes infected and swollen.",
-    what: "A surgeon makes small cuts in your abdomen and removes the appendix using a tiny camera (laparoscopic surgery). Smaller cuts means faster healing and less pain than older open surgery methods.",
-    recovery: "1–3 weeks. Most patients go home the next day.",
-    why: "A swollen appendix can burst and cause a life-threatening infection if not removed quickly.",
-    overallCount: 3,
+    what: "A surgeon makes a few small cuts in your abdomen and removes the appendix using a tiny camera — this is called laparoscopic surgery. The small cuts mean less pain, less scarring, and a faster return to normal life compared to older open surgery methods.",
+    recovery: "1–3 weeks. Most patients go home the next day and are back to light activity within a week.",
+    why: "A swollen appendix can burst and cause a life-threatening infection. Removing it quickly is the safest and most effective option.",
+    reassure: "This is one of the most commonly performed surgeries in the world. Surgical teams carry it out routinely, and the vast majority of patients recover fully without complications.",
+    safeCount: 97,
     riskFactors: [
+      { label: "No complications", pct: 97 },
       { label: "Wound infection", pct: 3 },
       { label: "Internal bleeding", pct: 1 },
-      { label: "Anesthesia reaction", pct: 0.5 },
       { label: "Injury to nearby organs", pct: 0.3 }
     ]
   },
   {
     name: "Knee replacement",
     tags: ["knee","replacement","joint","arthroplasty"],
-    risk: "med",
     plain: "The damaged surfaces of your knee joint are replaced with metal and plastic parts so your knee can move without pain.",
-    what: "A surgeon removes worn-out cartilage and bone from the knee and caps it with artificial components shaped to move like a real joint. Both sides of the joint are replaced.",
-    recovery: "6–12 weeks to walk comfortably. Full recovery can take up to a year with physical therapy.",
-    why: "Recommended when knee pain from arthritis is severe enough to limit daily activities and other treatments haven't helped.",
-    overallCount: 10,
+    what: "A surgeon removes worn-out cartilage and bone from the knee and replaces it with carefully shaped artificial components that mimic the natural movement of your joint. Both sides of the knee are resurfaced.",
+    recovery: "Most patients walk with assistance within a day or two of surgery. You will work with a physiotherapist to rebuild strength. Most people return to everyday activities within 6–12 weeks, with continued improvement for up to a year.",
+    why: "Recommended when knee pain from arthritis is severe enough to affect sleep, walking, or daily life, and other treatments such as medication and physiotherapy have not provided enough relief.",
+    reassure: "Knee replacement has a very high success rate. The majority of patients report significantly less pain and better mobility within a few months, with most artificial joints lasting 15–20 years.",
+    safeCount: 90,
     riskFactors: [
-      { label: "Blood clots in leg (DVT)", pct: 2 },
-      { label: "Infection", pct: 1 },
+      { label: "Good outcome, improved mobility", pct: 90 },
       { label: "Stiffness needing further treatment", pct: 4 },
-      { label: "Implant loosening within 10 years", pct: 5 }
+      { label: "Implant loosening within 10 years", pct: 5 },
+      { label: "Blood clots in leg (DVT)", pct: 2 },
+      { label: "Infection", pct: 1 }
     ]
   },
   {
     name: "Gallbladder removal (cholecystectomy)",
     tags: ["gallbladder","cholecystectomy","gallstones"],
-    risk: "low",
     plain: "Removal of the gallbladder — a small organ under your liver that stores bile. Done when gallstones cause repeated pain or blockages.",
-    what: "Using small cuts and a camera, the surgeon detaches and removes the gallbladder. Your body digests normally without it — bile flows directly from the liver to your intestine.",
-    recovery: "1–2 weeks for keyhole surgery. Up to 6 weeks if open surgery is needed.",
-    why: "Gallstones can block bile ducts, cause severe pain, and lead to serious infection if left untreated.",
-    overallCount: 3,
+    what: "Using small incisions and a tiny camera, the surgeon carefully detaches and removes the gallbladder. You can live completely normally without it — bile flows directly from your liver to your intestine and digestion carries on as usual.",
+    recovery: "Most patients go home the same day or the next morning. You can return to light activity within 1–2 weeks.",
+    why: "Gallstones can block bile ducts, trigger episodes of intense pain, and cause serious infections like cholecystitis or pancreatitis if not treated.",
+    reassure: "Gallbladder removal is among the safest and most routine operations performed today. Most patients feel significant relief from pain immediately after recovery and go on to live without any dietary restrictions.",
+    safeCount: 97,
     riskFactors: [
+      { label: "Full recovery, no issues", pct: 97 },
       { label: "Digestive changes (loose stools)", pct: 3 },
       { label: "Wound infection", pct: 2 },
       { label: "Bleeding", pct: 1 },
@@ -115,14 +161,15 @@ var procedures = [
   {
     name: "Coronary artery bypass (CABG)",
     tags: ["heart","bypass","cabg","coronary","cardiac"],
-    risk: "high",
-    plain: "A blood vessel from another part of your body is used to create a detour around a blocked heart artery, restoring blood flow to the heart muscle.",
-    what: "The chest is opened, and a vein or artery from your leg or chest wall is attached above and below the blockage to reroute blood. The heart may be temporarily stopped while a machine pumps blood for you.",
-    recovery: "4–6 weeks before light activity. Full recovery 3–6 months.",
-    why: "Performed when heart arteries are severely blocked and stents or medication alone are not enough to restore safe blood flow.",
-    overallCount: 25,
+    plain: "A healthy blood vessel taken from elsewhere in your body is used to create a bypass route around a blocked heart artery, restoring blood flow to your heart muscle.",
+    what: "The chest is opened and a vein or artery — often from your leg or chest wall — is stitched above and below the blockage to redirect blood flow around it. During surgery, a heart-lung machine temporarily takes over the work of your heart so the surgeon can work safely.",
+    recovery: "You will typically spend 4–7 days in hospital. Most patients return to light daily activities within 4–6 weeks and feel meaningfully better within 3 months. Full recovery takes around 3–6 months with cardiac rehabilitation support.",
+    why: "This surgery is recommended when arteries supplying the heart are severely narrowed and cannot be treated adequately with stents or medication alone. It significantly reduces the risk of heart attack and relieves chest pain.",
+    reassure: "While this is a major surgery, it is performed by highly specialized cardiac surgical teams thousands of times each year. Most patients experience a dramatic improvement in quality of life afterward — many describing it as life-changing. The surgery is carefully planned with your full team to minimize your individual risk.",
+    safeCount: 75,
     riskFactors: [
-      { label: "Irregular heartbeat (atrial fibrillation)", pct: 20 },
+      { label: "Successful outcome, improved heart function", pct: 75 },
+      { label: "Temporary irregular heartbeat (usually resolves)", pct: 20 },
       { label: "Temporary memory or thinking changes", pct: 15 },
       { label: "Kidney problems", pct: 5 },
       { label: "Wound infection", pct: 3 },
@@ -132,14 +179,15 @@ var procedures = [
   {
     name: "Hip replacement",
     tags: ["hip","replacement","joint","arthroplasty"],
-    risk: "med",
     plain: "The damaged ball-and-socket hip joint is replaced with artificial parts so you can move without pain.",
-    what: "The surgeon removes the worn femoral head (ball) and damaged socket, replacing both with metal, ceramic, or plastic implants that mimic the natural movement of your hip.",
-    recovery: "6 weeks to walk with assistance. Full recovery 3–6 months.",
-    why: "Recommended when hip arthritis or injury severely limits movement and pain medication no longer provides relief.",
-    overallCount: 10,
+    what: "The surgeon removes the worn femoral head (the ball at the top of your thigh bone) and the damaged socket, replacing both with smooth metal, ceramic, or plastic implants designed to replicate the natural gliding motion of your hip.",
+    recovery: "Most patients are up and walking with a frame within 24 hours of surgery. You can usually return home within 3–5 days. Most people resume normal daily activities within 6 weeks, with full recovery over 3–6 months.",
+    why: "Recommended when hip arthritis or injury has made everyday movement — walking, climbing stairs, or getting dressed — consistently painful and other treatments no longer provide relief.",
+    reassure: "Hip replacement is one of the most successful operations in medicine. Patient satisfaction rates are consistently high, and most people experience a level of pain-free movement they haven't had in years. Modern implants are designed to last 20 years or more.",
+    safeCount: 90,
     riskFactors: [
-      { label: "Leg length difference", pct: 5 },
+      { label: "Successful recovery, reduced pain", pct: 90 },
+      { label: "Leg length difference (usually minor)", pct: 5 },
       { label: "Joint dislocation", pct: 3 },
       { label: "Blood clots", pct: 2 },
       { label: "Infection", pct: 1 }
@@ -148,31 +196,33 @@ var procedures = [
   {
     name: "Cataract surgery",
     tags: ["eye","cataract","vision","lens"],
-    risk: "low",
     plain: "The cloudy lens inside your eye is removed and replaced with a clear artificial lens to restore your vision.",
-    what: "Using an ultrasound probe, the cloudy lens is broken up and removed through a tiny incision. A new clear lens is folded and inserted — no stitches are usually needed. The whole procedure takes about 15 minutes.",
-    recovery: "Most people see better within a few days. Full healing takes about 8 weeks.",
-    why: "Cataracts cloud the natural lens over time, making vision blurry, dim, or yellowish. Surgery is the only effective treatment.",
-    overallCount: 2,
+    what: "A tiny ultrasound probe breaks up the cloudy lens, which is then gently removed through a small opening smaller than 3mm. A new clear lens is folded and placed inside — no stitches are needed. The whole procedure takes around 15 minutes and you are awake throughout, though drops numb the eye completely.",
+    recovery: "Most people notice clearer vision within 24–48 hours. You use eye drops for a few weeks and avoid rubbing the eye. Full healing takes around 4–6 weeks.",
+    why: "Cataracts slowly cloud the natural lens, making vision blurry, dull, or yellowed. Surgery is the only way to restore clear sight, and the improvement is usually immediate and dramatic.",
+    reassure: "Cataract surgery is the most commonly performed elective surgery in the world and has an exceptional safety record. The vast majority of patients are delighted with their improved vision and describe the procedure as straightforward and painless.",
+    safeCount: 98,
     riskFactors: [
-      { label: "Posterior lens clouding (treatable with laser)", pct: 10 },
-      { label: "Swelling of the central vision area", pct: 1 },
+      { label: "Clear vision restored successfully", pct: 98 },
+      { label: "Posterior clouding needing laser (quick fix)", pct: 10 },
+      { label: "Swelling of central vision area", pct: 1 },
       { label: "Retinal detachment", pct: 0.5 },
-      { label: "Serious eye infection", pct: 0.1 }
+      { label: "Serious infection", pct: 0.1 }
     ]
   },
   {
     name: "Hysterectomy",
     tags: ["uterus","hysterectomy","gynecology","womb"],
-    risk: "med",
-    plain: "Surgical removal of the uterus. Sometimes the ovaries and fallopian tubes are also removed depending on the reason for surgery.",
-    what: "Can be done through the abdomen, vagina, or using keyhole surgery. After surgery, you will no longer have menstrual periods or be able to become pregnant.",
-    recovery: "4–6 weeks for most daily activities. Up to 8 weeks for full recovery.",
-    why: "Performed for fibroids, endometriosis, uterine prolapse, cancer, or chronic pelvic pain that hasn't responded to other treatments.",
-    overallCount: 10,
+    plain: "Surgical removal of the uterus. Depending on the reason for surgery, the ovaries and fallopian tubes may also be removed.",
+    what: "Can be carried out through a small abdominal incision, vaginally, or using keyhole surgery — your surgeon will recommend the most suitable approach based on your individual situation. After surgery you will no longer have periods or be able to become pregnant, which is an important consideration discussed fully before proceeding.",
+    recovery: "Most women return to light daily activities within 4–6 weeks. Full recovery takes 6–8 weeks. Your medical team will support you through any hormonal changes if the ovaries are also removed.",
+    why: "Performed to treat conditions such as fibroids, endometriosis, uterine prolapse, cancer, or persistent pelvic pain that has not improved with other treatments.",
+    reassure: "For most women, a hysterectomy brings significant and lasting relief from pain and discomfort that may have affected their daily life for years. Surgical teams are experienced in providing both physical and emotional support throughout this process.",
+    safeCount: 93,
     riskFactors: [
+      { label: "Successful outcome, symptom relief", pct: 93 },
       { label: "Infection", pct: 3 },
-      { label: "Heavy bleeding requiring transfusion", pct: 2 },
+      { label: "Heavy bleeding needing transfusion", pct: 2 },
       { label: "Blood clots", pct: 1 },
       { label: "Bladder or ureter injury", pct: 1 }
     ]
@@ -180,129 +230,140 @@ var procedures = [
   {
     name: "Hernia repair",
     tags: ["hernia","groin","abdominal","inguinal"],
-    risk: "low",
-    plain: "Tissue that has pushed through a weak spot in the abdominal wall is guided back into place and the weakness is reinforced — usually with a small surgical mesh patch.",
-    what: "Through small incisions, the surgeon guides the protruding tissue back into position and covers the weakened area with mesh that becomes permanent support, reducing the chance of the hernia returning.",
-    recovery: "1–3 weeks for light activity. Heavy lifting restricted for up to 6 weeks.",
-    why: "Hernias can become dangerous if the trapped tissue loses its blood supply — a medical emergency called strangulation.",
-    overallCount: 5,
+    plain: "Tissue that has pushed through a weak spot in the abdominal wall is guided back into place, and the weakened area is reinforced — usually with a small surgical mesh patch.",
+    what: "Through small incisions, the surgeon carefully positions the protruding tissue back where it belongs, then places a lightweight mesh over the weakened area. The mesh becomes integrated with your body over time, providing lasting support that significantly reduces the chance of the hernia returning.",
+    recovery: "Most patients go home the same day. Light activity is possible within 1–2 weeks, and most people return to normal life within 3 weeks. Heavy lifting is restricted for about 6 weeks while the mesh settles.",
+    why: "Left untreated, hernias can worsen over time and become dangerous if the trapped tissue loses its blood supply — an emergency called strangulation. Surgery resolves the problem permanently.",
+    reassure: "Hernia repair is a common, well-practiced procedure. Most patients are pleasantly surprised by how quick and straightforward the recovery is. Modern mesh techniques have made recurrence rare.",
+    safeCount: 95,
     riskFactors: [
+      { label: "Full recovery, hernia resolved", pct: 95 },
       { label: "Chronic pain at surgery site", pct: 8 },
       { label: "Hernia coming back", pct: 5 },
       { label: "Wound infection", pct: 2 },
-      { label: "Nerve damage", pct: 1 }
+      { label: "Nerve discomfort", pct: 1 }
     ]
   },
   {
     name: "Spinal fusion",
     tags: ["spine","back","spinal","fusion","vertebrae"],
-    risk: "high",
-    plain: "Two or more vertebrae (the bones in your spine) are permanently joined together to stop painful movement between them.",
-    what: "Bone graft material is placed between the targeted vertebrae. Metal rods, screws, or plates hold them in position while they slowly grow together into one solid piece of bone over several months.",
-    recovery: "3–6 months before returning to most normal activity. The bone fusion itself takes up to 1 year to fully complete.",
-    why: "Recommended for severe spinal instability, degenerative disc disease, scoliosis, or fractures compressing nearby nerves.",
-    overallCount: 20,
+    plain: "Two or more vertebrae (the bones of your spine) are permanently joined together to stop painful movement between them and stabilize the area.",
+    what: "Bone graft material — either from your own body or a donor — is placed between the targeted vertebrae. Metal rods, screws, or small plates hold everything in the correct position while the bones slowly grow together, forming one solid, stable structure over several months.",
+    recovery: "You will be helped to walk within a day or two of surgery. Most patients return to light daily activities within 4–6 weeks. Heavier activity resumes at 3–6 months as the fusion solidifies. Your team will support you with a tailored physiotherapy programme.",
+    why: "Recommended when spinal instability, degenerative disc disease, scoliosis, or a fracture is compressing nerves or causing severe pain that has not responded to non-surgical treatments.",
+    reassure: "While spinal fusion is a significant procedure, it is performed by specialist surgeons with extensive training. For patients who are suitable candidates, it often brings meaningful and long-lasting relief from pain that has significantly limited their life. Your surgical team will have thoroughly assessed that this is the right option for you.",
+    safeCount: 80,
     riskFactors: [
-      { label: "Adjacent spinal segment deterioration", pct: 15 },
-      { label: "Incomplete or failed bone fusion", pct: 5 },
+      { label: "Meaningful pain relief, improved stability", pct: 80 },
+      { label: "Adjacent spinal segment changes over time", pct: 15 },
+      { label: "Incomplete bone fusion", pct: 5 },
       { label: "Infection", pct: 4 },
-      { label: "Nerve damage", pct: 3 },
-      { label: "Metal hardware failure", pct: 3 }
+      { label: "Nerve discomfort", pct: 3 }
     ]
   },
   {
     name: "Tonsillectomy",
     tags: ["tonsils","tonsillectomy","throat","pediatric"],
-    risk: "low",
-    plain: "Surgical removal of the tonsils — two gland-like pads at the back of the throat — usually because of repeated infections or breathing difficulties.",
-    what: "The surgeon removes both tonsils through the mouth using a scalpel or energy-based cutting tool. Performed under general anesthesia, usually takes under an hour. Common in both children and adults.",
-    recovery: "7–14 days. The throat will be sore — soft foods, cold fluids, and rest are important throughout.",
-    why: "Recommended when tonsil infections recur frequently (typically 7 or more per year) or when enlarged tonsils block breathing during sleep.",
-    overallCount: 3,
+    plain: "Surgical removal of the tonsils — two small glands at the back of the throat — usually because of repeated infections or breathing difficulties during sleep.",
+    what: "The surgeon removes both tonsils through the mouth using a small cutting instrument. The procedure is performed under general anesthesia and typically takes 30–45 minutes. It is a very common procedure for both children and adults.",
+    recovery: "The throat will feel sore for 7–14 days. Cold fluids, soft foods, and rest are important. Pain is manageable with standard pain relief, and most children bounce back within 2 weeks.",
+    why: "Recommended when throat infections occur very frequently — typically 7 or more times a year — or when enlarged tonsils cause snoring, interrupted sleep, or breathing difficulties.",
+    reassure: "Tonsillectomy is a routine procedure that has helped millions of children and adults live free from recurring throat infections. Most families find that recovery, while a little uncomfortable, goes smoothly and that the long-term benefits far outweigh the short recovery period.",
+    safeCount: 97,
     riskFactors: [
-      { label: "Post-operative bleeding", pct: 3 },
-      { label: "Dehydration from not drinking", pct: 2 },
+      { label: "Smooth recovery, no complications", pct: 97 },
+      { label: "Post-operative bleeding (usually minor)", pct: 3 },
+      { label: "Dehydration from not drinking enough", pct: 2 },
       { label: "Infection", pct: 2 },
       { label: "Anesthesia reaction", pct: 0.5 }
     ]
   }
 ];
 
-function getRiskColor(pct) {
-  if (pct < 2) return '#639922';
-  if (pct <= 10) return '#BA7517';
-  return '#E24B4A';
-}
+function safeColor() { return '#2e86c1'; }
+function affectedColor() { return '#e8ae6a'; }
 
-function inWords(pct) {
+function inWords(pct, isPositive) {
+  if (isPositive) {
+    if (pct >= 98) return 'Nearly all patients — ' + pct + ' out of every 100';
+    if (pct >= 90) return 'The large majority — about ' + pct + ' out of every 100 patients';
+    return 'About ' + pct + ' out of every 100 patients';
+  }
   if (pct < 0.5) return 'Very rare — fewer than 1 in 200 patients';
   if (pct < 1)   return 'Uncommon — fewer than 1 in 100 patients';
   if (pct < 2)   return 'About 1 in every 100 patients';
   return 'About ' + Math.round(pct) + ' in every 100 patients';
 }
 
-function barWidth(pct) {
-  return Math.min((pct / 20) * 100, 100).toFixed(1);
-}
-
-function overallColor(risk) {
-  return risk === 'low' ? '#639922' : risk === 'med' ? '#BA7517' : '#E24B4A';
-}
-
-function buildIconGrid(count, color) {
+function buildIconGrid(safeCount) {
   var html = '<div class="icon-grid">';
   for (var i = 0; i < 100; i++) {
-    if (i < count) {
-      html += '<div class="icon-person" style="background:' + color + '"></div>';
+    if (i < safeCount) {
+      html += '<div class="icon-person safe"></div>';
     } else {
-      html += '<div class="icon-person"></div>';
+      html += '<div class="icon-person affected"></div>';
     }
   }
-  return html + '</div>';
+  return html + '</div>' +
+    '<div class="icon-legend">' +
+      '<div class="icon-legend-item"><div class="icon-legend-box" style="background:#2e86c1"></div>' + safeCount + ' out of 100 patients have a successful outcome</div>' +
+      '<div class="icon-legend-item"><div class="icon-legend-box" style="background:#e8ae6a"></div>' + (100 - safeCount) + ' out of 100 may experience a complication</div>' +
+    '</div>';
+}
+
+function buildDualBars(riskFactors) {
+  return riskFactors.map(function(f) {
+    var isPositive = f.pct >= 50;
+    var safeW = Math.min(f.pct, 100).toFixed(1);
+    var riskW = Math.min(100 - f.pct, 100).toFixed(1);
+    if (isPositive) {
+      return '<div class="outcome-item">' +
+        '<div class="outcome-item-top">' +
+          '<span class="outcome-item-label">' + f.label + '</span>' +
+          '<div class="outcome-pct-wrap"><span class="outcome-pct-safe">' + f.pct + '%</span></div>' +
+        '</div>' +
+        '<div class="dual-bar-track">' +
+          '<div class="dual-bar-safe" style="width:' + safeW + '%"></div>' +
+          '<div class="dual-bar-risk" style="width:' + riskW + '%"></div>' +
+        '</div>' +
+        '<div class="outcome-words">' + inWords(f.pct, true) + '</div>' +
+      '</div>';
+    } else {
+      var c = f.pct < 2 ? '#4caf7d' : f.pct <= 10 ? '#e8ae6a' : '#e07050';
+      return '<div class="outcome-item">' +
+        '<div class="outcome-item-top">' +
+          '<span class="outcome-item-label">' + f.label + '</span>' +
+          '<span class="outcome-pct-risk" style="color:' + c + ';font-size:13px;font-weight:700">' + f.pct + '%</span>' +
+        '</div>' +
+        '<div class="dual-bar-track">' +
+          '<div class="dual-bar-safe" style="width:' + Math.min((f.pct / 25) * 100, 100).toFixed(1) + '%;background:' + c + '"></div>' +
+        '</div>' +
+        '<div class="outcome-words">' + inWords(f.pct, false) + '</div>' +
+      '</div>';
+    }
+  }).join('');
 }
 
 function buildCard(p, i) {
-  var riskLabel = p.risk === 'low' ? 'Lower risk' : p.risk === 'med' ? 'Moderate risk' : 'Higher risk';
-  var oc = p.overallCount;
-  var oColor = overallColor(p.risk);
-
-  var bars = p.riskFactors.map(function(f) {
-    var c = getRiskColor(f.pct);
-    return '<div>' +
-      '<div class="risk-item-top">' +
-        '<span class="risk-item-label">' + f.label + '</span>' +
-        '<span class="risk-item-pct" style="color:' + c + '">' + f.pct + '%</span>' +
-      '</div>' +
-      '<div class="bar-track"><div class="bar-fill" style="width:' + barWidth(f.pct) + '%;background:' + c + '"></div></div>' +
-      '<div class="risk-words">' + inWords(f.pct) + '</div>' +
-    '</div>';
-  }).join('');
-
   return '<div class="card" onclick="toggle(' + i + ')">' +
-    '<div class="card-top">' +
-      '<div class="card-name">' + p.name + '</div>' +
-      '<span class="risk-badge risk-' + p.risk + '">' + riskLabel + '</span>' +
-    '</div>' +
+    '<div class="card-name">' + p.name + '</div>' +
     '<div class="card-plain">' + p.plain + '</div>' +
-    '<div class="expand-hint">Tap to see full breakdown and risk data &#8595;</div>' +
+    '<div class="expand-hint">Tap to learn more and see your outcome data &#8595;</div>' +
     '<div class="card-detail" id="detail-' + i + '">' +
+      '<div class="reassure-band"><p>' + p.reassure + '</p></div>' +
       '<div class="detail-row"><span class="detail-label">What happens</span><span class="detail-val">' + p.what + '</span></div>' +
       '<div class="detail-row"><span class="detail-label">Recovery</span><span class="detail-val">' + p.recovery + '</span></div>' +
       '<div class="detail-row"><span class="detail-label">Why it\'s done</span><span class="detail-val">' + p.why + '</span></div>' +
       '<div class="risk-section">' +
-        '<div class="risk-section-title">Risk breakdown</div>' +
-        '<div class="risk-section-sub">Real numbers on how often complications occur, discuss with your care provider if any concerns arise.</div>' +
+        '<div class="risk-section-title">What the numbers actually say</div>' +
+        '<div class="risk-section-sub">Real world outcomes.</div>' +
         '<div class="icon-block">' +
-          '<div class="icon-block-label">Out of every <strong>100 patients</strong> who have this procedure, about <strong style="color:' + oColor + '">' + oc + '</strong> may experience a complication. Each block below represents one patient:</div>' +
-          buildIconGrid(oc, oColor) +
+          '<div class="icon-block-label">Picture 100 patients having this procedure. Here is what typically happens:</div>' +
+          buildIconGrid(p.safeCount) +
         '</div>' +
-        '<div class="legend">' +
-          '<div class="legend-item"><div class="legend-dot" style="background:#639922"></div>Under 2% &mdash; low chance</div>' +
-          '<div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>2&ndash;10% &mdash; moderate</div>' +
-          '<div class="legend-item"><div class="legend-dot" style="background:#E24B4A"></div>Over 10% &mdash; higher chance</div>' +
-        '</div>' +
-        '<div class="risk-bars">' + bars + '</div>' +
-        '<div class="disclaimer">These figures are approximate averages drawn from published medical literature. Individual risk varies based on age, health history, and surgical setting. Always discuss your personal risk with your doctor.</div>' +
+        '<div class="outcome-title">Breakdown by outcome</div>' +
+        '<div class="outcome-bars">' + buildDualBars(p.riskFactors) + '</div>' +
+        '<div class="disclaimer">These figures are approximate population averages based on published medical research. Your personal outcome will depend on your age, overall health, and the specific details of your case. Your surgical team is the best source of guidance for your individual situation.</div>' +
       '</div>' +
     '</div>' +
   '</div>';
